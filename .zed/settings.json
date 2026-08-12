@@ -1,0 +1,43 @@
+// Folder-specific settings
+//
+// For a full list of overridable settings, and general information on folder-specific settings,
+// see the documentation: https://zed.dev/docs/configuring-zed#settings-files
+{
+  "format_on_save": "on",
+  "languages": {
+    "TypeScript": {
+      "tab_size": 2,
+      "format_on_save": "on",
+      "language_servers": ["!eslint", "vtsls"],
+      "formatter": {
+        "external": {
+          "command": "bun",
+          "arguments": [
+            "x",
+            "@biomejs/biome",
+            "format",
+            "--stdin-file-path",
+            "{buffer_path}",
+          ],
+        },
+      },
+    },
+    "Vue.js": {
+      "tab_size": 2,
+      "format_on_save": "on",
+      "language_servers": ["!eslint", "vue-language-server"],
+      "formatter": {
+        "external": {
+          "command": "bun",
+          "arguments": [
+            "x",
+            "@biomejs/biome",
+            "format",
+            "--stdin-file-path",
+            "{buffer_path}",
+          ],
+        },
+      },
+    },
+  },
+}

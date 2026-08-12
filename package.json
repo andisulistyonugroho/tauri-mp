@@ -10,8 +10,13 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "kysely": "^0.29.5",
+    "mysql2": "^3.23.3",
     "nuxt": "^4.5.2",
     "vue": "^3.5.41",
     "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.8"
   }
 }
