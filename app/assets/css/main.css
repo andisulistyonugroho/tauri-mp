@@ -2,4 +2,6 @@
 @import "@nuxt/ui";
 @theme {
     --font-sans: "Lato", system-ui, sans-serif;
+    --font-art-title: "Fraunces";
+    --font-art-body: "Source Sans 3";
 }

@@ -1,15 +1,3 @@
-// import { dbs } from "../../utils/db";
-
-interface CreatePostPayload {
-	author_id: number;
-	title: string;
-	slug: string;
-	category: string;
-	tags: string[];
-	body: string; // Markdown text string
-	status: "draft" | "published" | "archived";
-}
-
 export default defineEventHandler(async (event) => {
 	try {
 		const body = await readBody<CreatePostPayload>(event);
@@ -17,7 +5,7 @@ export default defineEventHandler(async (event) => {
 			const metaData = await trx
 				.insertInto("posts_metadata")
 				.values({
-					author_id: body.author_id,
+					author: body.author,
 					title: body.title,
 					slug: body.slug,
 					category: body.category,

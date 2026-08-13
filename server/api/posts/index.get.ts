@@ -11,7 +11,7 @@ export default defineEventHandler(async () => {
 				"pm.published_at",
 				sql<
 					string | null
-				>`SELECT GROUP_CONCAT(pt.tag) FROM posts_tags pt WHERE pt.post_id = pm.id)`.as(
+				>`(SELECT GROUP_CONCAT(pt.tag) FROM posts_tags pt WHERE pt.post_id = pm.id)`.as(
 					"tags_string",
 				),
 			])
