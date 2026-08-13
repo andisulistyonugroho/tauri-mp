@@ -22,10 +22,14 @@
         },
       },
     },
-    "Vue.js": {
+    "Vue": {
       "tab_size": 2,
       "format_on_save": "on",
-      "language_servers": ["!eslint", "vue-language-server"],
+      "language_servers": [
+        "!eslint",
+        "vue-language-server",
+        "tailwindcss-language-server",
+      ],
       "formatter": {
         "external": {
           "command": "bun",
@@ -38,6 +42,13 @@
           ],
         },
       },
+    },
+    "CSS": {
+      "language_servers": [
+        "tailwindcss-intellisense-css",
+        "!vscode-css-language-server",
+        "...",
+      ],
     },
   },
 }
