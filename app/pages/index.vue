@@ -12,7 +12,7 @@ type Posts = {
   published_at: string;
   tags: [];
 };
-
+const dialog = ref(false);
 const items = ref<Posts[]>();
 
 const columns: TableColumn<Posts>[] = [
@@ -83,7 +83,12 @@ fetchData();
 </script>
 
 <template>
-  <UButton icon="i-lucide-plus" label="Artikel" variant="soft" />
+  <UButton
+    icon="i-lucide-plus"
+    label="Artikel"
+    variant="soft"
+    @click="dialog = true"
+  />
   <UTable
     loading
     loading-color="primary"
@@ -93,4 +98,6 @@ fetchData();
     :columns="columns"
     class="flex-1"
   />
+
+  <Formarticle v-model="dialog" />
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const dialog = defineModel({ type: Boolean, default: false });
 const toast = useToast();
 
 const post_id = ref();
@@ -81,21 +82,45 @@ const doSave = useThrottleFn(
 );
 </script>
 <template>
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-dvh">
-    <div>
-      <div class="text-right">
-        <UButton @click="doSave()">Save</UButton>
+  <UModal
+    v-model:open="dialog"
+    fullscreen
+    :dismissible="false"
+    :ui="{ body: 'p-0 sm:p-0' }"
+  >
+    <template #header="{ close }">
+      <div class="flex items-center justify-between w-full">
+        <h2 class="font-semibold text-highlighted">Artikel {{ post_id }}</h2>
+        <div class="flex items-center gap-1.5">
+          <UButton
+            icon="i-lucide-save"
+            color="neutral"
+            variant="ghost"
+            @click="doSave()"
+          />
+          <UButton
+            icon="i-lucide-x"
+            color="neutral"
+            variant="ghost"
+            @click="close"
+          />
+        </div>
       </div>
-      <MonacoEditor
-        v-model="code"
-        lang="markdown"
-        :options="editorOptions"
-        style="height: 95%"
-      />
-    </div>
-    <div>
-      <MDC :value="code" />
-      {{ payload }}
-    </div>
-  </div>
+    </template>
+    <template #body>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-dvh">
+        <div>
+          <MonacoEditor
+            v-model="code"
+            lang="markdown"
+            :options="editorOptions"
+            style="height: 95%"
+          />
+        </div>
+        <div>
+          <MDC :value="code" />
+        </div>
+      </div>
+    </template>
+  </UModal>
 </template>
