@@ -3,12 +3,17 @@ export default defineNuxtConfig({
 	compatibilityDate: "2025-07-15",
 	devtools: { enabled: true },
 	ssr: false,
-	modules: ["@nuxt/ui", "nuxt-monaco-editor", "@nuxtjs/mdc", "@vueuse/nuxt"],
+	modules: ["@nuxt/ui", "@nuxtjs/mdc", "@vueuse/nuxt"],
 	future: {
 		compatibilityVersion: 4, // Ensures Nuxt 4 folder structures
 	},
 	css: ["~/assets/css/main.css"],
-	mdc: { highlight: { theme: "github-dark" } },
+	mdc: {
+		highlight: {
+			theme: "github-dark",
+			langs: ["js", "ts", "html", "css", "md", "json", "yaml", "vue", "bash"],
+		},
+	},
 	// 1. Auto-imports types ONLY for Frontend pages/components
 	imports: {
 		dirs: [

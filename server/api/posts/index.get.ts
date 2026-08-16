@@ -8,14 +8,16 @@ export default defineEventHandler(async () => {
 				"pm.title",
 				"pm.slug",
 				"pm.category",
+				"pm.created_at",
 				"pm.published_at",
+				"pm.updated_at",
+				"pm.status",
 				sql<
 					string | null
 				>`(SELECT GROUP_CONCAT(pt.tag) FROM posts_tags pt WHERE pt.post_id = pm.id)`.as(
 					"tags_string",
 				),
 			])
-			.where("pm.status", "=", "published")
 			.orderBy("pm.published_at", "desc")
 			.execute();
 

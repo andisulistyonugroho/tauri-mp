@@ -25,7 +25,7 @@ export interface PostMetadataTable {
 }
 
 export interface PostContentTable {
-	post_id: number;
+	post_id: number | null;
 	body: string;
 }
 

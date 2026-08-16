@@ -1,23 +1,21 @@
 <script setup lang="ts">
-const dialog = defineModel({ type: Boolean, default: false });
+import { Codemirror } from "vue-codemirror";
+import { markdown } from "@codemirror/lang-markdown";
+import { languages } from "@codemirror/language-data";
+import { oneDark } from "@codemirror/theme-one-dark";
+
 const toast = useToast();
 
-const post_id = ref();
-const editorOptions = {
-  theme: "vs-dark",
-  minimap: { enabled: false },
-  wordWrap: "on",
-  automaticLayout: true,
-} as const;
-const code = ref(`---
-  title:
-  author:
-  slug:
-  category:
-  tags:
-  status: draft
----
-# The title`);
+const dialog = defineModel("dialog", { type: Boolean, default: false });
+const post_id = defineModel("postid", { type: Number, default: null });
+const code = defineModel("code", {
+  type: String,
+  default: "",
+});
+const extensions = [markdown({ codeLanguages: languages }), oneDark];
+
+const emit = defineEmits(["reloadparent"]);
+
 const payload = ref<CreatePostPayload>({
   author: "",
   title: "",
@@ -29,7 +27,7 @@ const payload = ref<CreatePostPayload>({
 });
 
 const doSave = useThrottleFn(
-  async () => {
+  async (close?: string) => {
     try {
       const parsedData = await parseMarkdown(code.value);
       if (
@@ -72,6 +70,10 @@ const doSave = useThrottleFn(
       }
 
       toast.add({ title: "Data saved!", color: "success" });
+      emit("reloadparent");
+      if (close === "close") {
+        dialog.value = false;
+      }
     } catch (error: any) {
       toast.add({ title: error.message, color: "error" });
     }
@@ -93,10 +95,18 @@ const doSave = useThrottleFn(
         <h2 class="font-semibold text-highlighted">Artikel {{ post_id }}</h2>
         <div class="flex items-center gap-1.5">
           <UButton
-            icon="i-lucide-save"
+            icon="i-lucide-save-all"
+            color="neutral"
+            variant="ghost"
+            @click="doSave('close')"
+            label="Finish"
+          />
+          <UButton
+            icon="i-lucide-refresh-ccw"
             color="neutral"
             variant="ghost"
             @click="doSave()"
+            label="Update"
           />
           <UButton
             icon="i-lucide-x"
@@ -110,12 +120,13 @@ const doSave = useThrottleFn(
     <template #body>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-dvh">
         <div>
-          <MonacoEditor
-            v-model="code"
-            lang="markdown"
-            :options="editorOptions"
-            style="height: 95%"
-          />
+          <ClientOnly fallback="Loading Markdown Editor...">
+            <Codemirror
+              v-model="code"
+              :style="{ height: '500px' }"
+              :extensions="extensions"
+            />
+          </ClientOnly>
         </div>
         <div>
           <MDC :value="code" />

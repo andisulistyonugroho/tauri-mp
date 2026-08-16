@@ -2,47 +2,63 @@
 import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
 
+const UButton = resolveComponent("UButton");
 const UBadge = resolveComponent("UBadge");
+const UDropdownMenu = resolveComponent("UDropdownMenu");
 
-type Posts = {
-  id: string;
-  title: string;
-  slug: string;
-  category: string;
-  published_at: string;
-  tags: [];
-};
+const reloadKey = ref(0);
 const dialog = ref(false);
-const items = ref<Posts[]>();
+// const items = ref<PostMetadataTable[]>();
+const selectedData = ref<PostContentTable>({
+  post_id: null,
+  body: `---
+title:
+author:
+slug:
+category:
+tags:
+status: draft
+---
+# The title`,
+});
 
-const columns: TableColumn<Posts>[] = [
+const columns: TableColumn<PostMetadataTable>[] = [
   {
-    accessorKey: "id",
-    header: "#",
-    cell: ({ row }) => `#${row.getValue("id")}`,
+    accessorKey: "created_at",
+    header: "Tgl submit",
+    cell: ({ row }) => {
+      return useDateFormat(
+        row.getValue("created_at"),
+        "dddd, DD MMM YYYY HH:mm",
+        { locales: "id-ID" },
+      ).value;
+    },
   },
   {
-    accessorKey: "date",
-    header: "Date",
-    cell: ({ row }) => {
-      return new Date(row.getValue("date")).toLocaleString("en-US", {
-        day: "numeric",
-        month: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
-    },
+    accessorKey: "title",
+    header: "Judul",
+  },
+  {
+    accessorKey: "category",
+    header: "Kategori",
+  },
+  {
+    accessorKey: "slug",
+    header: "Slug",
+  },
+  {
+    accessorKey: "tags",
+    header: "Tags",
   },
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
       const color = {
-        paid: "success" as const,
-        failed: "error" as const,
-        refunded: "neutral" as const,
-      }[row.getValue("status") as string];
+        draft: "info" as const,
+        published: "success" as const,
+        archived: "neutral" as const,
+      }[row.original.status as string];
 
       return h(UBadge, { class: "capitalize", variant: "subtle", color }, () =>
         row.getValue("status"),
@@ -50,36 +66,66 @@ const columns: TableColumn<Posts>[] = [
     },
   },
   {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "amount",
-    header: "Amount",
+    id: "actions",
+    enableHiding: false,
     meta: {
       class: {
-        th: "text-right",
-        td: "text-right font-medium",
+        td: "text-right",
       },
     },
     cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue("amount"));
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "EUR",
-      }).format(amount);
+      const items = [
+        {
+          label: "Edit post",
+          async onClick() {
+            const id = row.original.id;
+            if (!id) {
+              return;
+            }
+            await getDetail(id);
+            dialog.value = true;
+          },
+        },
+      ];
+
+      return h(
+        UDropdownMenu,
+        {
+          content: {
+            align: "end",
+          },
+          items,
+          "aria-label": "Actions dropdown",
+        },
+        () =>
+          h(UButton, {
+            icon: "i-lucide-ellipsis-vertical",
+            color: "neutral",
+            variant: "ghost",
+            "aria-label": "Actions dropdown",
+          }),
+      );
     },
   },
 ];
 
-const fetchData = async () => {
-  const { data } = await useFetch<Posts[]>("/api/posts", {
-    method: "GET",
-  });
-  console.log("data:", data);
+const fetchData = () => {
+  clearNuxtData("cache-table-key");
+  refreshNuxtData("cache-table-key");
+  reloadKey.value++;
 };
 
-fetchData();
+const getDetail = async (id: number) => {
+  selectedData.value = await $fetch<PostContentTable>(`/api/posts/${id}`, {
+    method: "GET",
+  });
+};
+
+const { data: items } = await useFetch<PostMetadataTable[]>("/api/posts", {
+  method: "GET",
+  key: "cache-table-key",
+});
+// items.value = data.value;
 </script>
 
 <template>
@@ -87,9 +133,13 @@ fetchData();
     icon="i-lucide-plus"
     label="Artikel"
     variant="soft"
-    @click="dialog = true"
+    @click="
+      selectedData.post_id = null;
+      dialog = true;
+    "
   />
   <UTable
+    :key="reloadKey"
     loading
     loading-color="primary"
     loading-animation="carousel"
@@ -98,6 +148,10 @@ fetchData();
     :columns="columns"
     class="flex-1"
   />
-
-  <Formarticle v-model="dialog" />
+  <Formarticle
+    v-model:dialog="dialog"
+    v-model:postid="selectedData.post_id"
+    v-model:code="selectedData.body"
+    @reloadparent="fetchData()"
+  />
 </template>
