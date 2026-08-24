@@ -3,6 +3,7 @@ import { Codemirror } from "vue-codemirror";
 import { markdown } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { oneDark } from "@codemirror/theme-one-dark";
+import { invoke } from "@tauri-apps/api/core";
 
 const toast = useToast();
 
@@ -62,11 +63,11 @@ const doSave = useThrottleFn(
           body: payload.value,
         });
       } else {
-        const data = await $fetch("/api/posts", {
-          method: "POST",
-          body: payload.value,
+        const postId = await invoke<number>("create_post", {
+          payload: payload.value,
         });
-        post_id.value = data.postId;
+
+        post_id.value = postId;
       }
 
       toast.add({ title: "Data saved!", color: "success" });

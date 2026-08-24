@@ -26,5 +26,8 @@ export default defineNuxtConfig({
 		imports: {
 			dirs: ["../server/types"], // Nitro scans relative to the server/ directory
 		},
+		prerender: {
+			routes: ["/"],
+		},
 	},
 });

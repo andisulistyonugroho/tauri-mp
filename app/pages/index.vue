@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
+import { invoke } from "@tauri-apps/api/core";
 
 const UButton = resolveComponent("UButton");
 const UBadge = resolveComponent("UBadge");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
+const toast = useToast();
 
 const reloadKey = ref(0);
 const dialog = ref(false);
-// const items = ref<PostMetadataTable[]>();
+const items = ref<PostMetadataTable[]>();
 const selectedData = ref<PostContentTable>({
   post_id: null,
   body: `---
@@ -109,10 +111,21 @@ const columns: TableColumn<PostMetadataTable>[] = [
   },
 ];
 
-const fetchData = () => {
-  clearNuxtData("cache-table-key");
-  refreshNuxtData("cache-table-key");
-  reloadKey.value++;
+const fetchData = async () => {
+  try {
+    clearNuxtData("cache-table-key");
+    refreshNuxtData("cache-table-key");
+
+    const data = await invoke<PostMetadataTable[]>("get_posts");
+    items.value = data;
+    alert(data);
+    console.log("data:", data);
+
+    reloadKey.value++;
+  } catch (error: any) {
+    console.log(error);
+    toast.add({ title: error, color: "error" });
+  }
 };
 
 const getDetail = async (id: number) => {
@@ -121,11 +134,7 @@ const getDetail = async (id: number) => {
   });
 };
 
-const { data: items } = await useFetch<PostMetadataTable[]>("/api/posts", {
-  method: "GET",
-  key: "cache-table-key",
-});
-// items.value = data.value;
+fetchData();
 </script>
 
 <template>
