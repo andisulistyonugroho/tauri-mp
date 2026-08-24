@@ -118,8 +118,6 @@ const fetchData = async () => {
 
     const data = await invoke<PostMetadataTable[]>("get_posts");
     items.value = data;
-    alert(data);
-    console.log("data:", data);
 
     reloadKey.value++;
   } catch (error: any) {
@@ -129,9 +127,8 @@ const fetchData = async () => {
 };
 
 const getDetail = async (id: number) => {
-  selectedData.value = await $fetch<PostContentTable>(`/api/posts/${id}`, {
-    method: "GET",
-  });
+  const data = await invoke<PostContentTable>("detail_post", { id: id });
+  selectedData.value = data;
 };
 
 fetchData();

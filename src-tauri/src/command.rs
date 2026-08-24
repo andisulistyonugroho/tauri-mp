@@ -25,6 +25,12 @@ pub struct CreatePostPayload {
     pub body: String,
 }
 
+#[derive(Debug, Serialize)]
+pub struct PostContent {
+    pub post_id: i64,
+    pub body: String,
+}
+
 #[tauri::command]
 pub fn get_posts() -> Result<Vec<PostsMetadata>, String> {
     let conn = connect_db().map_err(|e| e.to_string())?;
@@ -93,4 +99,26 @@ pub fn create_post(payload: CreatePostPayload) -> Result<i64, String> {
     tx.commit().map_err(|e| e.to_string())?;
 
     Ok(new_id)
+}
+
+#[tauri::command]
+pub fn detail_post(id: i64) -> Result<PostContent, String> {
+    let conn = connect_db().map_err(|e| e.to_string())?;
+    let mut stmt = conn
+        .prepare(
+            "SELECT post_id,body
+        FROM posts_content WHERE post_id = ?1",
+        )
+        .map_err(|e| e.to_string())?;
+
+    let data = stmt
+        .query_one([id], |row| {
+            Ok(PostContent {
+                post_id: row.get("post_id")?,
+                body: row.get("body")?,
+            })
+        })
+        .map_err(|e| e.to_string())?;
+
+    Ok(data)
 }
