@@ -1,7 +1,7 @@
 mod command;
 mod db;
 
-use command::{create_post, detail_post, get_posts};
+use command::{create_post, detail_post, get_posts, update_post};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -19,7 +19,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_posts,
             create_post,
-            detail_post
+            detail_post,
+            update_post
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

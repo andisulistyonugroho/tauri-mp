@@ -131,6 +131,21 @@ const getDetail = async (id: number) => {
   selectedData.value = data;
 };
 
+const resetForm = () => {
+  selectedData.value = {
+    post_id: null,
+    body: `---
+title:
+author:
+slug:
+category:
+tags:
+status: draft
+---
+# The title`,
+  };
+};
+
 fetchData();
 </script>
 
@@ -140,6 +155,7 @@ fetchData();
     label="Artikel"
     variant="soft"
     @click="
+      resetForm();
       selectedData.post_id = null;
       dialog = true;
     "

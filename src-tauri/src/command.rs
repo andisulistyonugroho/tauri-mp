@@ -8,13 +8,14 @@ pub struct PostsMetadata {
     pub title: String,
     pub category: String,
     pub status: String,
+    pub tags: String,
     pub published_at: Option<String>,
     pub created_at: String,
     pub updated_at: String,
     pub author: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CreatePostPayload {
     pub slug: String,
     pub title: String,
@@ -31,25 +32,36 @@ pub struct PostContent {
     pub body: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct PostDetail {
+    pub id: i64,
+
+    #[serde(flatten)] // merge fields
+    pub metadata: CreatePostPayload,
+}
+
 #[tauri::command]
 pub fn get_posts() -> Result<Vec<PostsMetadata>, String> {
     let conn = connect_db().map_err(|e| e.to_string())?;
     let mut stmt = conn
-        .prepare("SELECT id, slug, title, category, status, author, published_at, created_at, updated_at FROM posts_metadata LIMIT 1")
+        .prepare("SELECT a.id, a.slug, a.title, a.category, a.status, a.author, a.published_at, a.created_at, a.updated_at,
+            (SELECT group_concat(b.tag) FROM posts_tags b WHERE b.post_id = a.id) AS tags
+            FROM posts_metadata a")
         .map_err(|e| e.to_string())?;
 
     let data = stmt
         .query_map([], |row| {
             Ok(PostsMetadata {
-                id: row.get(0)?,
-                slug: row.get(1)?,
-                title: row.get(2)?,
-                category: row.get(3)?,
-                status: row.get(4)?,
-                author: row.get(5)?,
-                published_at: row.get(6)?,
-                created_at: row.get(7)?,
-                updated_at: row.get(8)?,
+                id: row.get("id")?,
+                slug: row.get("slug")?,
+                title: row.get("title")?,
+                category: row.get("category")?,
+                status: row.get("status")?,
+                author: row.get("author")?,
+                published_at: row.get("published_at")?,
+                created_at: row.get("created_at")?,
+                updated_at: row.get("updated_at")?,
+                tags: row.get("tags")?,
             })
         })
         .map_err(|e| e.to_string())?;
@@ -121,4 +133,45 @@ pub fn detail_post(id: i64) -> Result<PostContent, String> {
         .map_err(|e| e.to_string())?;
 
     Ok(data)
+}
+
+#[tauri::command]
+pub fn update_post(payload: PostDetail) -> Result<i64, String> {
+    let mut conn = connect_db().map_err(|e| e.to_string())?;
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+
+    tx.execute(
+        "UPDATE posts_metadata SET slug = ?1, title = ?2, category = ?3, author = ?4, status = ?5 WHERE id = ?6",
+        (
+            &payload.metadata.slug,
+            &payload.metadata.title,
+            &payload.metadata.category,
+            &payload.metadata.author,
+            &payload.metadata.status,
+            &payload.id,
+        ),
+    )
+    .map_err(|e| e.to_string())?;
+
+    tx.execute(
+        "UPDATE posts_content SET body = ?2 WHERE post_id = ?1",
+        (&payload.id, &payload.metadata.body),
+    )
+    .map_err(|e| e.to_string())?;
+
+    tx.execute("DELETE FROM posts_tags WHERE post_id = ?1", [&payload.id])
+        .map_err(|e| e.to_string())?;
+
+    for tag in &payload.metadata.tags {
+        let trimmed_tag: &str = tag.trim();
+        tx.execute(
+            "INSERT INTO posts_tags (post_id, tag) VALUES (?1,?2)",
+            (&payload.id, trimmed_tag),
+        )
+        .map_err(|e| e.to_string())?;
+    }
+
+    tx.commit().map_err(|e| e.to_string())?;
+
+    Ok(payload.id)
 }

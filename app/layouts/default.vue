@@ -34,14 +34,6 @@ function getItems(state: "collapsed" | "expanded") {
     },
   ] satisfies NavigationMenuItem[];
 }
-
-const user = ref({
-  name: "Benjamin Canac",
-  avatar: {
-    src: "",
-    alt: "Benjamin Canac",
-  },
-});
 </script>
 
 <template>
@@ -65,7 +57,7 @@ const user = ref({
           :ui="{
             trailingIcon: 'text-dimmed ms-auto',
           }"
-          >Majelispembaca</UButton
+          >MP</UButton
         >
       </template>
 

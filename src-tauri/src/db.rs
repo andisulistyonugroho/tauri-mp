@@ -20,8 +20,7 @@ pub fn connect_db() -> Result<Connection> {
     );
 
     CREATE TRIGGER IF NOT EXISTS update_posts_metadata_updated_at
-    AFTER UPDATE ON posts_metadata
-    FOR EACH ROW
+    AFTER UPDATE OF slug, title, category, status, author ON posts_metadata
     BEGIN
         UPDATE posts_metadata
         SET updated_at = CURRENT_TIMESTAMP

@@ -45,7 +45,9 @@ const doSave = useThrottleFn(
         !parsedData.data.tags ||
         parsedData.data.tags === ""
       ) {
-        throw new Error("Error: Data not completed");
+        throw new Error(
+          "No data to input: make sure title, author, slug, category, status, tags are filled",
+        );
       }
 
       payload.value.author = parsedData.data.author;
@@ -58,15 +60,14 @@ const doSave = useThrottleFn(
 
       if (post_id.value) {
         payload.value.id = post_id.value;
-        await $fetch("/api/posts", {
-          method: "PATCH",
-          body: payload.value,
+        await invoke<number>("update_post", {
+          payload: payload.value,
         });
+        console.log(payload.value);
       } else {
         const postId = await invoke<number>("create_post", {
           payload: payload.value,
         });
-
         post_id.value = postId;
       }
 
@@ -75,8 +76,11 @@ const doSave = useThrottleFn(
       if (close === "close") {
         dialog.value = false;
       }
-    } catch (error: any) {
-      toast.add({ title: error.message, color: "error" });
+    } catch (err: any) {
+      toast.add({
+        title: err instanceof Error ? err.message : String(err),
+        color: "error",
+      });
     }
   },
   1000,
