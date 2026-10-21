@@ -18,6 +18,7 @@ export interface PostMetadataTable {
 	slug: string;
 	title: string;
 	category: string;
+	tags: string;
 	status: "draft" | "published" | "archived";
 	published_at: Date | null;
 	created_at: Generated<Date>;

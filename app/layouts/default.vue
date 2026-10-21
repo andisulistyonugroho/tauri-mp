@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
 
-const open = ref(true);
+const open = ref(false);
 
 function getItems(state: "collapsed" | "expanded") {
   return [
@@ -73,7 +73,7 @@ function getItems(state: "collapsed" | "expanded") {
 
     <div class="flex-1 flex flex-col">
       <div
-        class="h-(--ui-header-height) shrink-0 flex items-center px-4 border-b border-default"
+        class="h-(--ui-header-height) shrink-0 flex justify-between items-center px-4 border-b border-default"
       >
         <UButton
           icon="i-lucide-panel-left"
@@ -82,6 +82,9 @@ function getItems(state: "collapsed" | "expanded") {
           aria-label="Toggle sidebar"
           @click="open = !open"
         />
+        <UButton color="error" icon="i-lucide-cloud-upload" variant="soft"
+          >Upload</UButton
+        >
       </div>
 
       <div class="flex-1 p-4">

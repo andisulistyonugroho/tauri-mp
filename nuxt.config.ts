@@ -11,7 +11,18 @@ export default defineNuxtConfig({
 	mdc: {
 		highlight: {
 			theme: "github-dark",
-			langs: ["js", "ts", "html", "css", "md", "json", "yaml", "vue", "bash"],
+			langs: [
+				"js",
+				"ts",
+				"html",
+				"css",
+				"md",
+				"json",
+				"yaml",
+				"vue",
+				"bash",
+				"sql",
+			],
 		},
 	},
 	// 1. Auto-imports types ONLY for Frontend pages/components

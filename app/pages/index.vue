@@ -23,34 +23,17 @@ status: draft
 ---
 # The title`,
 });
+const statuses = [
+  { label: "Draft", value: "draft" },
+  { label: "Published", value: "published" },
+  { label: "Archived", value: "archived" },
+];
+const status = ref();
 
 const columns: TableColumn<PostMetadataTable>[] = [
   {
-    accessorKey: "created_at",
-    header: "Tgl submit",
-    cell: ({ row }) => {
-      return useDateFormat(
-        row.getValue("created_at"),
-        "dddd, DD MMM YYYY HH:mm",
-        { locales: "id-ID" },
-      ).value;
-    },
-  },
-  {
     accessorKey: "title",
     header: "Judul",
-  },
-  {
-    accessorKey: "category",
-    header: "Kategori",
-  },
-  {
-    accessorKey: "slug",
-    header: "Slug",
-  },
-  {
-    accessorKey: "tags",
-    header: "Tags",
   },
   {
     accessorKey: "status",
@@ -150,16 +133,27 @@ fetchData();
 </script>
 
 <template>
-  <UButton
-    icon="i-lucide-plus"
-    label="Artikel"
-    variant="soft"
-    @click="
-      resetForm();
-      selectedData.post_id = null;
-      dialog = true;
-    "
-  />
+  <div class="flex gap-2">
+    <UButton
+      icon="i-lucide-plus"
+      label="Artikel"
+      variant="soft"
+      @click="
+        resetForm();
+        selectedData.post_id = null;
+        dialog = true;
+      "
+    />
+    <USelectMenu
+      v-model="status"
+      :items="statuses"
+      option-attribute="name"
+      placeholder="Select status"
+      icon="i-heroicons-squares-2x2"
+      clear
+    />
+  </div>
+
   <UTable
     :key="reloadKey"
     loading
@@ -168,8 +162,16 @@ fetchData();
     sticky
     :data="items"
     :columns="columns"
-    class="flex-1"
-  />
+  >
+    <template #title-cell="{ row }">
+      <div class="font-bold text-white">{{ row.original.title }}</div>
+      <div class="text-xs">
+        {{ formatIdDate(row.original.created_at) }}
+      </div>
+      <div class="text-xs">tags: {{ row.original.tags }}</div>
+      <div class="text-xs">slug: {{ row.original.slug }}</div>
+    </template>
+  </UTable>
   <Formarticle
     v-model:dialog="dialog"
     v-model:postid="selectedData.post_id"
