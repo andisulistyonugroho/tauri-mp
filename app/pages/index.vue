@@ -50,48 +50,48 @@ const columns: TableColumn<PostMetadataTable>[] = [
       );
     },
   },
-  {
-    id: "actions",
-    enableHiding: false,
-    meta: {
-      class: {
-        td: "text-right",
-      },
-    },
-    cell: ({ row }) => {
-      const items = [
-        {
-          label: "Edit post",
-          async onClick() {
-            const id = row.original.id;
-            if (!id) {
-              return;
-            }
-            await getDetail(id);
-            dialog.value = true;
-          },
-        },
-      ];
+  // {
+  //   id: "actions",
+  //   enableHiding: false,
+  //   meta: {
+  //     class: {
+  //       td: "text-right",
+  //     },
+  //   },
+  //   cell: ({ row }) => {
+  //     const items = [
+  //       {
+  //         label: "Edit post",
+  //         async onClick() {
+  //           const id = row.original.id;
+  //           if (!id) {
+  //             return;
+  //           }
+  //           await getDetail(id);
+  //           dialog.value = true;
+  //         },
+  //       },
+  //     ];
 
-      return h(
-        UDropdownMenu,
-        {
-          content: {
-            align: "end",
-          },
-          items,
-          "aria-label": "Actions dropdown",
-        },
-        () =>
-          h(UButton, {
-            icon: "i-lucide-ellipsis-vertical",
-            color: "neutral",
-            variant: "ghost",
-            "aria-label": "Actions dropdown",
-          }),
-      );
-    },
-  },
+  //     return h(
+  //       UDropdownMenu,
+  //       {
+  //         content: {
+  //           align: "end",
+  //         },
+  //         items,
+  //         "aria-label": "Actions dropdown",
+  //       },
+  //       () =>
+  //         h(UButton, {
+  //           icon: "i-lucide-ellipsis-vertical",
+  //           color: "neutral",
+  //           variant: "ghost",
+  //           "aria-label": "Actions dropdown",
+  //         }),
+  //     );
+  //   },
+  // },
 ];
 
 const fetchData = async () => {
@@ -152,6 +152,7 @@ fetchData();
       icon="i-heroicons-squares-2x2"
       clear
     />
+    <UInput placeholder="Cari" icon="i-lucide-search" />
   </div>
 
   <UTable
@@ -164,12 +165,22 @@ fetchData();
     :columns="columns"
   >
     <template #title-cell="{ row }">
-      <div class="font-bold text-white">{{ row.original.title }}</div>
-      <div class="text-xs">
-        {{ formatIdDate(row.original.created_at) }}
+      <div
+        v-if="row.original.id"
+        @click="
+          getDetail(row.original.id);
+          dialog = true;
+        "
+      >
+        <div class="font-bold text-white">
+          {{ row.original.title }}
+        </div>
+        <div class="text-xs">
+          {{ formatIdDate(row.original.created_at) }}
+        </div>
+        <div class="text-xs">tags: {{ row.original.tags }}</div>
+        <div class="text-xs">slug: {{ row.original.slug }}</div>
       </div>
-      <div class="text-xs">tags: {{ row.original.tags }}</div>
-      <div class="text-xs">slug: {{ row.original.slug }}</div>
     </template>
   </UTable>
   <Formarticle
