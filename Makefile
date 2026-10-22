@@ -1,4 +1,4 @@
-.PHONY: duckdump
+.PHONY: duckdump uploadpost
 
 duckdump:
 	@duckdb -c "\
@@ -12,5 +12,8 @@ duckdump:
 		    sqlite_scan('../database/mp_database.db','posts_tags') c \
 		WHERE a.id = b.post_id AND b.post_id = c.post_id \
 		GROUP BY a.id,a.slug,a.title,a.category,a.published_at,a.author,b.body) \
-	        TO '../database/portof.parquet' (format 'parquet', compression 'snappy'); \
-	"
+	        TO '~/GO/PORTOF/gzipportof/post.parquet' (format 'parquet', compression 'snappy');"
+
+uploadpost:
+	make duckdump
+	scp ~/GO/PORTOF/gzipportof/* sabang:PORTOF/gzipportof/.

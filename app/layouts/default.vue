@@ -1,7 +1,30 @@
 <script setup lang="ts">
+import { invoke } from "@tauri-apps/api/core";
 import type { NavigationMenuItem } from "@nuxt/ui";
 
+const toast = useToast();
 const open = ref(false);
+const loading = ref(false);
+
+const doUpload = useThrottleFn(
+  async () => {
+    try {
+      loading.value = true;
+      const successLog = await invoke<string>("upload_post");
+      toast.add({ title: successLog, color: "success" });
+      loading.value = false;
+    } catch (err) {
+      loading.value = false;
+      toast.add({
+        title: err instanceof Error ? err.message : String(err),
+        color: "error",
+      });
+    }
+  },
+  5000,
+  false,
+  true,
+);
 
 function getItems(state: "collapsed" | "expanded") {
   return [
@@ -82,7 +105,12 @@ function getItems(state: "collapsed" | "expanded") {
           aria-label="Toggle sidebar"
           @click="open = !open"
         />
-        <UButton color="error" icon="i-lucide-cloud-upload" variant="soft"
+        <UButton
+          color="error"
+          icon="i-lucide-cloud-upload"
+          variant="soft"
+          @click="doUpload"
+          :loading="loading"
           >Upload</UButton
         >
       </div>

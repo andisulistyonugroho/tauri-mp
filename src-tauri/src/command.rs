@@ -1,5 +1,6 @@
 use crate::db::connect_db;
 use serde::{Deserialize, Serialize};
+use std::process::Command;
 
 #[derive(Debug, Serialize)]
 pub struct PostsMetadata {
@@ -174,4 +175,31 @@ pub fn update_post(payload: PostDetail) -> Result<i64, String> {
     tx.commit().map_err(|e| e.to_string())?;
 
     Ok(payload.id)
+}
+
+#[tauri::command]
+pub fn upload_post() -> Result<String, String> {
+    let make_target = "uploadpost";
+    let makefile_dir = "../";
+
+    let output = Command::new("make")
+        .arg(make_target)
+        .current_dir(makefile_dir)
+        .output()
+        .map_err(|e| format!("Failed to spawn 'make' command: {}", e))?;
+
+    if output.status.success() {
+        let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+        Ok(format!(
+            "Uploading parquet completed successfully!\n\n{}",
+            stdout
+        ))
+    } else {
+        let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+        Err(format!(
+            "Makefile execution failed (Exit Code {}):\n{}",
+            output.status.code().unwrap_or(-1),
+            stderr
+        ))
+    }
 }
