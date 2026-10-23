@@ -180,7 +180,7 @@ pub fn update_post(payload: PostDetail) -> Result<i64, String> {
 #[tauri::command]
 pub fn upload_post() -> Result<String, String> {
     let make_target = "uploadpost";
-    let makefile_dir = "../";
+    let makefile_dir = "/Users/asn/Sites/MP/backend-mp/";
 
     let output = Command::new("make")
         .arg(make_target)
