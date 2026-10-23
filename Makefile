@@ -1,7 +1,14 @@
-.PHONY: duckdump uploadpost
+.PHONY: createapp duckdump uploadpost
+
+createapp:
+	cd src-tauri && \
+	cargo clean && \
+	cargo update && \
+	cd .. && \
+	bun tauri build
 
 duckdump:
-	@duckdb -c "\
+	@/opt/homebrew/bin/duckdb -c "\
 	INSTALL sqlite; \
 	LOAD sqlite; \
 	COPY ( \
@@ -10,10 +17,10 @@ duckdump:
 	        sqlite_scan('../database/mp_database.db','posts_metadata') a, \
 		    sqlite_scan('../database/mp_database.db','posts_content') b, \
 		    sqlite_scan('../database/mp_database.db','posts_tags') c \
-		WHERE a.id = b.post_id AND b.post_id = c.post_id \
+		WHERE a.id = b.post_id AND b.post_id = c.post_id AND a.status = 'published' \
 		GROUP BY a.id,a.slug,a.title,a.category,a.published_at,a.author,b.body) \
 	        TO '~/GO/PORTOF/gzipportof/post.parquet' (format 'parquet', compression 'snappy');"
 
 uploadpost:
 	make duckdump
-	scp ~/GO/PORTOF/gzipportof/* sabang:PORTOF/gzipportof/.
+	scp ~/GO/PORTOF/gzipportof/post.parquet sabang:PORTOF/gzipportof/.
