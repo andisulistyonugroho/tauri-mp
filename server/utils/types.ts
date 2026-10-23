@@ -10,6 +10,7 @@ export interface CreatePostPayload {
 	tags: string[];
 	body: string; // Markdown text string
 	status: "draft" | "published" | "archived";
+	published_at: string | null;
 }
 
 export interface PostMetadataTable {
@@ -20,7 +21,7 @@ export interface PostMetadataTable {
 	category: string;
 	tags: string;
 	status: "draft" | "published" | "archived";
-	published_at: Date | null;
+	published_at: string | null;
 	created_at: Generated<Date>;
 	updated_at: Generated<Date>;
 }

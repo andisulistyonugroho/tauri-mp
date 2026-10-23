@@ -25,6 +25,7 @@ pub struct CreatePostPayload {
     pub tags: Vec<String>,
     pub author: Option<String>,
     pub body: String,
+    pub published_at: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -81,13 +82,14 @@ pub fn create_post(payload: CreatePostPayload) -> Result<i64, String> {
     let tx = conn.transaction().map_err(|e| e.to_string())?;
 
     tx.execute(
-        "INSERT INTO posts_metadata (slug, title, category, author, status) VALUES (?1,?2,?3,?4,?5)",
+        "INSERT INTO posts_metadata (slug, title, category, author, status, published_at) VALUES (?1,?2,?3,?4,?5,?6)",
         (
             &payload.slug,
             &payload.title,
             &payload.category,
             &payload.author,
-            &payload.status
+            &payload.status,
+            &payload.published_at
         ),
     )
     .map_err(|e| e.to_string())?;
@@ -142,13 +144,14 @@ pub fn update_post(payload: PostDetail) -> Result<i64, String> {
     let tx = conn.transaction().map_err(|e| e.to_string())?;
 
     tx.execute(
-        "UPDATE posts_metadata SET slug = ?1, title = ?2, category = ?3, author = ?4, status = ?5 WHERE id = ?6",
+        "UPDATE posts_metadata SET slug = ?1, title = ?2, category = ?3, author = ?4, status = ?5, published_at = ?6 WHERE id = ?7",
         (
             &payload.metadata.slug,
             &payload.metadata.title,
             &payload.metadata.category,
             &payload.metadata.author,
             &payload.metadata.status,
+            &payload.metadata.published_at,
             &payload.id,
         ),
     )
@@ -183,8 +186,9 @@ pub fn upload_post() -> Result<String, String> {
     let makefile_dir = "/Users/asn/Sites/MP/backend-mp/";
 
     let output = Command::new("make")
+        .arg("-C")
+        .arg(makefile_dir)
         .arg(make_target)
-        .current_dir(makefile_dir)
         .output()
         .map_err(|e| format!("Failed to spawn 'make' command: {}", e))?;
 
