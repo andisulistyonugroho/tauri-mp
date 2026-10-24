@@ -48,7 +48,7 @@ pub fn get_posts() -> Result<Vec<PostsMetadata>, String> {
     let mut stmt = conn
         .prepare("SELECT a.id, a.slug, a.title, a.category, a.status, a.author, a.published_at, a.created_at, a.updated_at,
             (SELECT group_concat(b.tag) FROM posts_tags b WHERE b.post_id = a.id) AS tags
-            FROM posts_metadata a")
+            FROM posts_metadata a order by a.id desc")
         .map_err(|e| e.to_string())?;
 
     let data = stmt

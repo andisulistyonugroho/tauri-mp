@@ -125,7 +125,9 @@ category:
 tags:
 status: draft
 ---
-# The title`,
+<h2 align="center">
+The title
+</h2>`,
   };
 };
 
@@ -173,13 +175,12 @@ fetchData();
         "
       >
         <div class="font-bold text-white">
-          {{ row.original.title }}
+          {{ row.original.id }}) {{ row.original.title }}
         </div>
         <div class="text-xs">
-          {{ formatIdDate(row.original.created_at) }}
+          {{ formatIdDate(row.original.created_at) }} &bullet;
+          {{ row.original.slug }} &bullet; {{ row.original.tags }}
         </div>
-        <div class="text-xs">tags: {{ row.original.tags }}</div>
-        <div class="text-xs">slug: {{ row.original.slug }}</div>
       </div>
     </template>
   </UTable>

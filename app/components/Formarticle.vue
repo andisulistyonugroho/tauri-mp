@@ -146,7 +146,7 @@ const doSave = useThrottleFn(
           <ClientOnly fallback="Loading Markdown Editor...">
             <Codemirror
               v-model="code"
-              :style="{ height: '500px' }"
+              :style="{ height: '100vh' }"
               :extensions="extensions"
             />
           </ClientOnly>
