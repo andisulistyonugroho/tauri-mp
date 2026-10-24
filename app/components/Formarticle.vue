@@ -158,7 +158,7 @@ const doSave = useThrottleFn(
             />
           </ClientOnly>
         </div>
-        <div class="text-sm">
+        <div class="text-sm h-dvh overflow-y-auto">
           <MDC :value="code" :key="code" />
         </div>
       </div>
