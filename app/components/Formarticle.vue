@@ -74,7 +74,10 @@ const doSave = useThrottleFn(
       payload.value.tags = parsedData.data.tags.split(",");
       payload.value.body = code.value;
       payload.value.published_at =
-        parsedData.data.status === "published" ? getSQLiteTimestamp() : null;
+        parsedData.data.published_at != null &&
+        parsedData.data.status === "published"
+          ? getSQLiteTimestamp()
+          : null;
 
       if (post_id.value) {
         payload.value.id = post_id.value;
@@ -152,7 +155,7 @@ const doSave = useThrottleFn(
           </ClientOnly>
         </div>
         <div>
-          <MDC :value="code" />
+          <MDC :value="code" :key="code" />
         </div>
       </div>
     </template>

@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-	compatibilityDate: "2025-07-15",
+	compatibilityDate: "2026-10-24",
 	devtools: { enabled: true },
 	ssr: false,
 	modules: ["@nuxt/ui", "@nuxtjs/mdc", "@vueuse/nuxt"],
@@ -22,6 +22,7 @@ export default defineNuxtConfig({
 				"vue",
 				"bash",
 				"sql",
+				"go",
 			],
 		},
 	},
