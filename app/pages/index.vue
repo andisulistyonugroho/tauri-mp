@@ -23,6 +23,7 @@ status: draft
 ---
 # The title`,
 });
+const selectedPublishAt = ref<string | null>();
 const statuses = [
   { label: "Draft", value: "draft" },
   { label: "Published", value: "published" },
@@ -109,9 +110,10 @@ const fetchData = async () => {
   }
 };
 
-const getDetail = async (id: number) => {
+const getDetail = async (id: number, published_at: string | null) => {
   const data = await invoke<PostContentTable>("detail_post", { id: id });
   selectedData.value = data;
+  selectedPublishAt.value = published_at;
 };
 
 const resetForm = () => {
@@ -170,7 +172,7 @@ fetchData();
       <div
         v-if="row.original.id"
         @click="
-          getDetail(row.original.id);
+          getDetail(row.original.id, row.original.published_at);
           dialog = true;
         "
       >
@@ -187,6 +189,7 @@ fetchData();
   <Formarticle
     v-model:dialog="dialog"
     v-model:postid="selectedData.post_id"
+    v-model:publishedat="selectedPublishAt"
     v-model:code="selectedData.body"
     @reloadparent="fetchData()"
   />

@@ -13,6 +13,11 @@ const code = defineModel("code", {
   type: String,
   default: "",
 });
+const published_at = defineModel("publishedat", {
+  type: String,
+  default: null,
+});
+
 const extensions = [markdown({ codeLanguages: languages }), oneDark];
 
 const emit = defineEmits(["reloadparent"]);
@@ -74,10 +79,9 @@ const doSave = useThrottleFn(
       payload.value.tags = parsedData.data.tags.split(",");
       payload.value.body = code.value;
       payload.value.published_at =
-        parsedData.data.published_at != null &&
-        parsedData.data.status === "published"
+        published_at.value === null && parsedData.data.status === "published"
           ? getSQLiteTimestamp()
-          : null;
+          : published_at.value;
 
       if (post_id.value) {
         payload.value.id = post_id.value;
@@ -154,7 +158,7 @@ const doSave = useThrottleFn(
             />
           </ClientOnly>
         </div>
-        <div>
+        <div class="text-sm">
           <MDC :value="code" :key="code" />
         </div>
       </div>

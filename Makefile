@@ -1,6 +1,8 @@
 .PHONY: createapp duckdump uploadpost
 
 createapp:
+	bunx nuxi cleanup && \
+	bunx nuxi prepare && \
 	cd src-tauri && \
 	cargo clean && \
 	cargo update && \
